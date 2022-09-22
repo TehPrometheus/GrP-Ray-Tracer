@@ -12,9 +12,9 @@ namespace dae
 		//SPHERE HIT-TESTS
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//todo W1
-
-			/* Analytical Solution
+			//todo W1 DONE
+			// Analytical Solution
+			/* 
 				float	A{ Vector3::Dot(ray.direction,ray.direction) },
 						B{ Vector3::Dot(2 * ray.direction,(ray.origin - sphere.origin)) },
 						C{ Vector3::Dot((ray.origin - sphere.origin),(ray.origin - sphere.origin)) - Square(sphere.radius) },
@@ -70,7 +70,7 @@ namespace dae
 				hitRecord.didHit = true;
 				hitRecord.origin = ray.origin;
 				hitRecord.t = dp - t_ca;
-				hitNormal = L + hitRecord.t * ray.direction; //looks weird, is more performant
+				hitNormal = L + hitRecord.t * ray.direction; // looks weird, is more performant
 				hitRecord.normal = hitNormal.Normalized();
 			}
 			else
