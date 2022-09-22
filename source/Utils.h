@@ -13,8 +13,74 @@ namespace dae
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W1
-			assert(false && "No Implemented Yet!");
-			return false;
+
+			/* Analytical Solution
+				float	A{ Vector3::Dot(ray.direction,ray.direction) },
+						B{ Vector3::Dot(2 * ray.direction,(ray.origin - sphere.origin)) },
+						C{ Vector3::Dot((ray.origin - sphere.origin),(ray.origin - sphere.origin)) - Square(sphere.radius) },
+						D{ Square(B) - 4 * A * C };
+
+				float	t_0{ (-B - sqrtf(D)) / (2 * A) };
+
+				Vector3 hitPoint{};
+				Vector3 hitNormal{};
+
+				if (D > 0)
+				{
+					hitRecord.didHit = true;
+					hitRecord.origin = ray.origin;
+					if (t_0 > ray.min && t_0 < ray.max)
+					{
+						hitRecord.t = t_0;
+						hitPoint = ray.origin + t_0 * ray.direction;
+						hitNormal = hitPoint - sphere.origin;
+						hitRecord.normal = hitNormal.Normalized();
+						return true;
+					}
+					else
+					{
+						float t_1{ (-B + sqrtf(D)) / (2 * A) };
+						if (t_1 > ray.min && t_1 < ray.max)
+						{
+							hitRecord.t = t_1;
+							hitPoint = ray.origin + t_1 * ray.direction;
+							hitNormal = hitPoint - sphere.origin;
+							hitRecord.normal = hitNormal.Normalized();
+							return true;
+						}
+					}
+				}
+				else
+				{
+					hitRecord.didHit = false;
+					return false;
+				}
+
+			*/
+
+			// Geometric Solution
+			Vector3 hitNormal{};
+			Vector3 L{ sphere.origin - ray.origin };
+			float dp{ Vector3::Dot(L,ray.direction) };
+			float od_squared{ L.SqrMagnitude() - Square(dp) };
+
+			if (od_squared < Square(sphere.radius))
+			{
+				float t_ca{ sqrtf(Square(sphere.radius) - od_squared) };
+				hitRecord.didHit = true;
+				hitRecord.origin = ray.origin;
+				hitRecord.t = dp - t_ca;
+				hitNormal = L + hitRecord.t * ray.direction; //looks weird, is more performant
+				hitRecord.normal = hitNormal.Normalized();
+			}
+			else
+			{
+				hitRecord.didHit = false;
+				return false;
+			}
+
+
+			
 		}
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)

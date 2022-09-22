@@ -1,6 +1,8 @@
 #include "Scene.h"
 #include "Utils.h"
 #include "Material.h"
+#include <iostream>
+
 
 namespace dae {
 
@@ -114,6 +116,7 @@ namespace dae {
 		const unsigned char matId_Solid_Yellow = AddMaterial(new Material_SolidColor{ colors::Yellow });
 		const unsigned char matId_Solid_Green = AddMaterial(new Material_SolidColor{ colors::Green });
 		const unsigned char matId_Solid_Magenta = AddMaterial(new Material_SolidColor{ colors::Magenta });
+		
 
 		//Spheres
 		AddSphere({ -25.f, 0.f, 100.f }, 50.f, matId_Solid_Red);
