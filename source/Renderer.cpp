@@ -47,18 +47,19 @@ void Renderer::Render(Scene* pScene) const
 
 			rayDirection = rayDirection.Normalized();
 
+			ColorRGB finalColor{};
 			Ray hitRay{ {0,0,0} , rayDirection };
 			HitRecord closestHit{};
-			ColorRGB finalColor{};
-			Sphere testSphere{ {0.f,0.f,100.f}, 50.f,0 };
+			Plane testPlane{ {0.f,-50.f,0.f },{0.f,1.f,0.f }, 0 };
+			GeometryUtils::HitTest_Plane(testPlane, hitRay, closestHit);
+			//pScene->GetClosestHit(hitRay, closestHit);
 
-			GeometryUtils::HitTest_Sphere(testSphere, hitRay, closestHit);
 
 			//Give pixel appropriate color
 			if (closestHit.didHit)
 			{
-				const float scaled_t = (closestHit.t - 50.f) / 40.f;
 				//finalColor = materials[closestHit.materialIndex]->Shade();
+				const float scaled_t = (closestHit.t / 500.f);
 				finalColor = { scaled_t,scaled_t,scaled_t };
 			}
 

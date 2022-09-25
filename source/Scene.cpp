@@ -30,8 +30,37 @@ namespace dae {
 
 	void dae::Scene::GetClosestHit(const Ray& ray, HitRecord& closestHit) const
 	{
-		//todo W1
-		assert(false && "No Implemented Yet!");
+		//todo W1 DONE
+		HitRecord temp{};
+		for (size_t i = 0; i < m_SphereGeometries.size(); i++)
+		{
+			if (GeometryUtils::HitTest_Sphere(m_SphereGeometries[i], ray, temp))
+			{
+				if (temp.t <= closestHit.t)
+				{
+					closestHit.didHit = temp.didHit;
+					closestHit.materialIndex = temp.materialIndex;
+					closestHit.normal = temp.normal;
+					closestHit.origin = temp.origin;
+					closestHit.t = temp.t;
+				}
+			}
+		}
+		for (size_t i = 0; i < m_PlaneGeometries.size(); i++)
+		{
+			if (GeometryUtils::HitTest_Plane(m_PlaneGeometries[i], ray, temp))
+			{
+				if (temp.t <= closestHit.t)
+				{
+					closestHit.didHit = temp.didHit;
+					closestHit.materialIndex = temp.materialIndex;
+					closestHit.normal = temp.normal;
+					closestHit.origin = temp.origin;
+					closestHit.t = temp.t;
+				}
+			}
+		}
+
 	}
 
 	bool Scene::DoesHit(const Ray& ray) const

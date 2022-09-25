@@ -14,7 +14,7 @@ namespace dae
 		{
 			//todo W1 DONE
 			// Analytical Solution
-			/* 
+			/*
 				float	A{ Vector3::Dot(ray.direction,ray.direction) },
 						B{ Vector3::Dot(2 * ray.direction,(ray.origin - sphere.origin)) },
 						C{ Vector3::Dot((ray.origin - sphere.origin),(ray.origin - sphere.origin)) - Square(sphere.radius) },
@@ -28,13 +28,14 @@ namespace dae
 				if (D > 0)
 				{
 					hitRecord.didHit = true;
-					hitRecord.origin = ray.origin;
 					if (t_0 > ray.min && t_0 < ray.max)
 					{
 						hitRecord.t = t_0;
+						hitRecord.origin = ray.origin + t_0 * ray.direction;
 						hitPoint = ray.origin + t_0 * ray.direction;
 						hitNormal = hitPoint - sphere.origin;
 						hitRecord.normal = hitNormal.Normalized();
+						hitRecord.materialIndex = sphere.materialIndex;
 						return true;
 					}
 					else
@@ -43,9 +44,11 @@ namespace dae
 						if (t_1 > ray.min && t_1 < ray.max)
 						{
 							hitRecord.t = t_1;
+							hitRecord.origin = ray.origin + t_1 * ray.direction;
 							hitPoint = ray.origin + t_1 * ray.direction;
 							hitNormal = hitPoint - sphere.origin;
 							hitRecord.normal = hitNormal.Normalized();
+							hitRecord.materialIndex = sphere.materialIndex;
 							return true;
 						}
 					}
@@ -55,8 +58,8 @@ namespace dae
 					hitRecord.didHit = false;
 					return false;
 				}
-
 			*/
+			
 
 			// Geometric Solution
 			Vector3 hitNormal{};
@@ -68,14 +71,14 @@ namespace dae
 			{
 				float t_ca{ sqrtf(Square(sphere.radius) - od_squared) };
 				hitRecord.didHit = true;
-				hitRecord.origin = ray.origin;
 				hitRecord.t = dp - t_ca;
+				hitRecord.origin = ray.origin + hitRecord.t * ray.direction;
 				hitNormal = L + hitRecord.t * ray.direction; // looks weird, is more performant
+				hitRecord.materialIndex = sphere.materialIndex;
 				hitRecord.normal = hitNormal.Normalized();
 			}
 			else
 			{
-				hitRecord.didHit = false;
 				return false;
 			}
 
@@ -93,8 +96,18 @@ namespace dae
 		//PLANE HIT-TESTS
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//todo W1
-			assert(false && "No Implemented Yet!");
+			//todo W1 DONE
+			float t{ Vector3::Dot((plane.origin - ray.origin),plane.normal) / Vector3::Dot(ray.direction,plane.normal)};
+			if (t > ray.min && t < ray.max)
+			{
+				hitRecord.didHit = true;
+				hitRecord.materialIndex = plane.materialIndex;
+				hitRecord.normal = plane.normal;
+				hitRecord.origin = ray.origin + t * ray.direction;
+				hitRecord.t = t;
+				return true;
+
+			}
 			return false;
 		}
 
