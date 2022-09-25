@@ -4,6 +4,7 @@
 
 struct SDL_Window;
 struct SDL_Surface;
+struct ColorRGB;
 
 namespace dae
 {
