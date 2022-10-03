@@ -20,6 +20,9 @@ Renderer::Renderer(SDL_Window * pWindow) :
 	//Initialize
 	SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
 	m_pBufferPixels = static_cast<uint32_t*>(m_pBuffer->pixels);
+	m_WidthFloat = static_cast<float>(m_Width);
+	m_HeightFloat = static_cast<float>(m_HeightFloat);
+
 }
 
 void Renderer::Render(Scene* pScene) const
@@ -37,8 +40,8 @@ void Renderer::Render(Scene* pScene) const
 			float	px_c{ px + 0.5f }, 
 					py_c{ py + 0.5f };
 				  
-			float	c_x{ ((2 * px_c) - m_Width) / m_Height },
-					c_y{ 1 - (2 * py_c) / m_Height };
+			float	c_x{ ((2 * px_c) - m_WidthFloat) * camera.FOV / m_WidthFloat },
+					c_y{ 1 - ((2 * py_c) * camera.FOV / m_WidthFloat) };
 
 			// Make appropriate ray
 			rayDirection.x = c_x;
@@ -47,20 +50,31 @@ void Renderer::Render(Scene* pScene) const
 
 			rayDirection = rayDirection.Normalized();
 
+			const Matrix cameraToWorld = camera.CalculateCameraToWorld();
+			cameraToWorld.TransformVector(rayDirection);
+
 			ColorRGB finalColor{};
-			Ray hitRay{ {0,0,0} , rayDirection };
+			Ray viewRay{ camera.origin , rayDirection };
 			HitRecord closestHit{};
-			Plane testPlane{ {0.f,-50.f,0.f },{0.f,1.f,0.f }, 0 };
-			GeometryUtils::HitTest_Plane(testPlane, hitRay, closestHit);
-			//pScene->GetClosestHit(hitRay, closestHit);
+			//Plane testPlane{ {0.f,-50.f,0.f },{0.f,1.f,0.f }, 0 };
+			//GeometryUtils::HitTest_Plane(testPlane, hitRay, closestHit);
+			pScene->GetClosestHit(viewRay, closestHit);
 
 
 			//Give pixel appropriate color
 			if (closestHit.didHit)
 			{
-				//finalColor = materials[closestHit.materialIndex]->Shade();
-				const float scaled_t = (closestHit.t / 500.f);
-				finalColor = { scaled_t,scaled_t,scaled_t };
+				finalColor = materials[closestHit.materialIndex]->Shade();
+
+				for (size_t lightIdx = 0; lightIdx < lights.size(); lightIdx++)
+				{
+					Vector3 directionToLight = LightUtils::GetDirectionToLight(lights[lightIdx], closestHit.origin + closestHit.normal * 0.01f);
+					Ray lightRay{ closestHit.origin + closestHit.normal * 0.01f, directionToLight.Normalized(), 0.0001f, directionToLight.Magnitude() };
+					if (pScene->DoesHit(lightRay))
+					{
+						finalColor * 0.5f;
+					}
+				}
 			}
 
 			//Update Color in Buffer
