@@ -14,68 +14,79 @@ namespace dae
 		{
 			//todo W1 DONE
 			// Analytical Solution
-			/*
-				float	A{ Vector3::Dot(ray.direction,ray.direction) },
-						B{ Vector3::Dot(2 * ray.direction,(ray.origin - sphere.origin)) },
-						C{ Vector3::Dot((ray.origin - sphere.origin),(ray.origin - sphere.origin)) - Square(sphere.radius) },
-						D{ Square(B) - 4 * A * C };
+				//float	A{ Vector3::Dot(ray.direction,ray.direction) },
+				//		B{ Vector3::Dot(2 * ray.direction,(ray.origin - sphere.origin)) },
+				//		C{ Vector3::Dot((ray.origin - sphere.origin),(ray.origin - sphere.origin)) - Square(sphere.radius) },
+				//		D{ Square(B) - 4 * A * C };
 
-				float	t_0{ (-B - sqrtf(D)) / (2 * A) };
+				//float	t_0{ (-B - sqrtf(D)) / (2 * A) };
 
-				Vector3 hitPoint{};
-				Vector3 hitNormal{};
+				//Vector3 hitPoint{};
+				//Vector3 hitNormal{};
 
-				if (D > 0)
-				{
-					hitRecord.didHit = true;
-					if (t_0 > ray.min && t_0 < ray.max)
-					{
-						hitRecord.t = t_0;
-						hitRecord.origin = ray.origin + t_0 * ray.direction;
-						hitPoint = ray.origin + t_0 * ray.direction;
-						hitNormal = hitPoint - sphere.origin;
-						hitRecord.normal = hitNormal.Normalized();
-						hitRecord.materialIndex = sphere.materialIndex;
-						return true;
-					}
-					else
-					{
-						float t_1{ (-B + sqrtf(D)) / (2 * A) };
-						if (t_1 > ray.min && t_1 < ray.max)
-						{
-							hitRecord.t = t_1;
-							hitRecord.origin = ray.origin + t_1 * ray.direction;
-							hitPoint = ray.origin + t_1 * ray.direction;
-							hitNormal = hitPoint - sphere.origin;
-							hitRecord.normal = hitNormal.Normalized();
-							hitRecord.materialIndex = sphere.materialIndex;
-							return true;
-						}
-					}
-				}
-				else
-				{
-					hitRecord.didHit = false;
-					return false;
-				}
-			*/
+				//if (D > 0)
+				//{
+				//	hitRecord.didHit = true;
+				//	if (t_0 > ray.min && t_0 < ray.max)
+				//	{
+				//		hitRecord.t = t_0;
+				//		hitRecord.origin = ray.origin + t_0 * ray.direction;
+				//		hitPoint = ray.origin + t_0 * ray.direction;
+				//		hitNormal = hitPoint - sphere.origin;
+				//		hitRecord.normal = hitNormal.Normalized();
+				//		hitRecord.materialIndex = sphere.materialIndex;
+				//		return true;
+				//	}
+				//	else
+				//	{
+				//		float t_1{ (-B + sqrtf(D)) / (2 * A) };
+				//		if (t_1 > ray.min && t_1 < ray.max)
+				//		{
+				//			hitRecord.t = t_1;
+				//			hitRecord.origin = ray.origin + t_1 * ray.direction;
+				//			hitPoint = ray.origin + t_1 * ray.direction;
+				//			hitNormal = hitPoint - sphere.origin;
+				//			hitRecord.normal = hitNormal.Normalized();
+				//			hitRecord.materialIndex = sphere.materialIndex;
+				//			return true;
+				//		}
+				//	}
+				//}
+				//else
+				//{
+				//	hitRecord.didHit = false;
+				//	return false;
+				//}
 			
 
 			// Geometric Solution
 			Vector3 hitNormal{};
 			Vector3 L{ sphere.origin - ray.origin };
 			float dp{ Vector3::Dot(L,ray.direction) };
-			float od_squared{ L.SqrMagnitude() - Square(dp) };
 
-			if (od_squared < Square(sphere.radius))
+			float od_squared{ L.SqrMagnitude() - (dp*dp) };
+
+			if (od_squared < (sphere.radius * sphere.radius) )
 			{
 				float t_ca{ sqrtf(Square(sphere.radius) - od_squared) };
-				hitRecord.didHit = true;
-				hitRecord.t = dp - t_ca;
-				hitRecord.origin = ray.origin + hitRecord.t * ray.direction;
-				hitNormal = L + hitRecord.t * ray.direction; // looks weird, is more performant
-				hitRecord.materialIndex = sphere.materialIndex;
-				hitRecord.normal = hitNormal.Normalized();
+				if ((dp - t_ca) > ray.min && (dp - t_ca) < ray.max)
+				{
+					if (!ignoreHitRecord)
+					{
+						hitRecord.didHit = true;
+						hitRecord.t = dp - t_ca;
+						hitRecord.origin = ray.origin + hitRecord.t * ray.direction;
+						hitNormal = hitRecord.origin - sphere.origin;
+						hitRecord.materialIndex = sphere.materialIndex;
+						hitRecord.normal = hitNormal.Normalized();
+					}
+					return true;
+
+				}
+				else
+				{
+					return false;
+				}
 			}
 			else
 			{

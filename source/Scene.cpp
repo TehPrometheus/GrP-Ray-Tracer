@@ -66,16 +66,16 @@ namespace dae {
 	bool Scene::DoesHit(const Ray& ray) const
 	{
 		//todo W3
-		for (size_t sphereIdx = 0; sphereIdx < m_SphereGeometries.size(); sphereIdx++)
+		for (size_t planeIdx = 0; planeIdx < m_PlaneGeometries.size(); planeIdx++)
 		{
-			if (GeometryUtils::HitTest_Sphere(m_SphereGeometries[sphereIdx], ray))
+			if (GeometryUtils::HitTest_Plane(m_PlaneGeometries[planeIdx],ray))
 			{
 				return true;
 			}
 		}
-		for (size_t planeIdx = 0; planeIdx < m_PlaneGeometries.size(); planeIdx++)
+		for (size_t sphereIdx = 0; sphereIdx < m_SphereGeometries.size(); sphereIdx++)
 		{
-			if (GeometryUtils::HitTest_Plane(m_PlaneGeometries[planeIdx],ray))
+			if (GeometryUtils::HitTest_Sphere(m_SphereGeometries[sphereIdx], ray))
 			{
 				return true;
 			}

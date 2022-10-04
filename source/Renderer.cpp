@@ -37,11 +37,11 @@ void Renderer::Render(Scene* pScene) const
 		for (int py{}; py < m_Height; ++py)
 		{
 			// Raster space to camera space
-			float	px_c{ px + 0.5f }, 
+			const float	px_c{ px + 0.5f }, 
 					py_c{ py + 0.5f };
 				  
-			float	c_x{ ((2 * px_c) - m_WidthFloat) * camera.FOV / m_WidthFloat },
-					c_y{ 1 - ((2 * py_c) * camera.FOV / m_WidthFloat) };
+			const float	c_x{ ((2 * px_c) - m_WidthFloat) * camera.FOV / m_WidthFloat },
+						c_y{ 1 - ((2 * py_c) * camera.FOV / m_WidthFloat) };
 
 			// Make appropriate ray
 			rayDirection.x = c_x;
@@ -51,7 +51,7 @@ void Renderer::Render(Scene* pScene) const
 			rayDirection = rayDirection.Normalized();
 
 			const Matrix cameraToWorld = camera.CalculateCameraToWorld();
-			cameraToWorld.TransformVector(rayDirection);
+			rayDirection = cameraToWorld.TransformVector(rayDirection);
 
 			ColorRGB finalColor{};
 			Ray viewRay{ camera.origin , rayDirection };
@@ -65,7 +65,6 @@ void Renderer::Render(Scene* pScene) const
 			if (closestHit.didHit)
 			{
 				finalColor = materials[closestHit.materialIndex]->Shade();
-
 				for (size_t lightIdx = 0; lightIdx < lights.size(); lightIdx++)
 				{
 					Vector3 directionToLight = LightUtils::GetDirectionToLight(lights[lightIdx], closestHit.origin + closestHit.normal * 0.01f);

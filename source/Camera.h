@@ -2,6 +2,7 @@
 #include <cassert>
 #include <SDL_keyboard.h>
 #include <SDL_mouse.h>
+#include <iostream>
 
 #include "Math.h"
 #include "Timer.h"
@@ -77,7 +78,6 @@ namespace dae
 			//Mouse Input
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
-
 			if (mouseState & SDL_BUTTON(1))
 			{
 
@@ -135,9 +135,8 @@ namespace dae
 				}
 			}
 
-			Matrix finalRotation{ Matrix::CreateRotation({ totalPitch, totalYaw, 0 }) };
+			const Matrix finalRotation{ Matrix::CreateRotation({ totalPitch, totalYaw, 0 }) };
 			forward = finalRotation.TransformVector(Vector3::UnitZ);
-			forward.Normalize();
 			//todo: W2 DONE
 		}
 	};
