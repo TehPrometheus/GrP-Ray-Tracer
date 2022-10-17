@@ -133,10 +133,10 @@ void Renderer::ProcessKeyUpEvent(const SDL_Event& e)
 {
 	switch (e.key.keysym.scancode)
 	{
-	case SDL_SCANCODE_F1:
+	case SDL_SCANCODE_F2:
 		m_AreShadowsEnabled = !m_AreShadowsEnabled;
 		break;
-	case SDL_SCANCODE_F2:
+	case SDL_SCANCODE_F3:
 		m_CurrentLightingMode = static_cast<LightingMode>((static_cast<int>(m_CurrentLightingMode) + 1) % 4);
 		break;
 	}
