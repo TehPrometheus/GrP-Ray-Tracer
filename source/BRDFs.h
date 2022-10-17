@@ -11,18 +11,19 @@ namespace dae
 		 * \param cd Diffuse Color
 		 * \return Lambert Diffuse Color
 		 */
-		static ColorRGB Lambert(float kd, const ColorRGB& cd)
+		static ColorRGB Lambert(const float kd, const ColorRGB& cd)
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			//todo: W3 DONE
+
+			return {cd * ( kd / static_cast<float>(M_PI))};
 		}
 
 		static ColorRGB Lambert(const ColorRGB& kd, const ColorRGB& cd)
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			//todo: W3 DONE
+			ColorRGB temp{ cd * kd };
+			temp /= static_cast<float>(M_PI);
+			return temp;
 		}
 
 		/**
@@ -36,9 +37,11 @@ namespace dae
 		 */
 		static ColorRGB Phong(float ks, float exp, const Vector3& l, const Vector3& v, const Vector3& n)
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			//todo: W3 DONE
+			const Vector3 reflect{ l - 2 * (Vector3::Dot(n,l)) * n };
+			const float cosine{ Vector3::Dot(reflect.Normalized(),v.Normalized()) };
+			const float phongValue{ ks * powf(cosine,exp) };
+			return { phongValue, phongValue, phongValue };
 		}
 
 		/**
@@ -50,9 +53,12 @@ namespace dae
 		 */
 		static ColorRGB FresnelFunction_Schlick(const Vector3& h, const Vector3& v, const ColorRGB& f0)
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			//todo: W3 DONE
+			const float temp{ powf(1 - Vector3::Dot(h,v),5) };
+
+			return {	f0.r + (1 - f0.r) * temp,
+						f0.g + (1 - f0.g) * temp,
+						f0.b + (1 - f0.b) * temp };
 		}
 
 		/**
@@ -64,9 +70,9 @@ namespace dae
 		 */
 		static float NormalDistribution_GGX(const Vector3& n, const Vector3& h, float roughness)
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			//todo: W3 DONE
+			const float alphaSquared{ powf(roughness,4) };
+			return (alphaSquared) / (static_cast<float>(M_PI) * Square(Vector3::Dot(n,h)*Vector3::Dot(n,h)*(alphaSquared - 1) + 1));
 		}
 
 
@@ -79,9 +85,12 @@ namespace dae
 		 */
 		static float GeometryFunction_SchlickGGX(const Vector3& n, const Vector3& v, float roughness)
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			//todo: W3 DONE
+			const float alpha{ roughness * roughness };
+			const float k_direct{ (alpha + 1.f) * (alpha + 1.f) / 8.f };
+
+			return (Vector3::Dot(n,v)) / (Vector3::Dot(n,v) * (1 - k_direct) + k_direct);
+
 		}
 
 		/**
@@ -94,9 +103,8 @@ namespace dae
 		 */
 		static float GeometryFunction_Smith(const Vector3& n, const Vector3& v, const Vector3& l, float roughness)
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			//todo: W3 DONE
+			return BRDF::GeometryFunction_SchlickGGX(n,v,roughness)* BRDF::GeometryFunction_SchlickGGX(n, l, roughness);
 		}
 
 	}

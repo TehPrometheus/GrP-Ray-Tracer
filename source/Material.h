@@ -59,9 +59,8 @@ namespace dae
 
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			//todo: W3 DONE
+			return BRDF::Lambert(m_DiffuseReflectance,m_DiffuseColor);
 		}
 
 	private:
@@ -84,9 +83,8 @@ namespace dae
 
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			//todo: W3 DONE
+			return BRDF::Lambert(m_DiffuseReflectance,m_DiffuseColor) + BRDF::Phong(m_SpecularReflectance,m_PhongExponent,l,-v,hitRecord.normal);
 		}
 
 	private:
@@ -109,9 +107,30 @@ namespace dae
 
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			//todo: W3 DONE
+			ColorRGB f0{ 0.04f, 0.04f, 0.04f };
+			const Vector3 h{ (v + l) / (v + l).Magnitude() };
+			ColorRGB kd{ ColorRGB{1,1,1} - BRDF::FresnelFunction_Schlick(h,v,f0) };
+
+			if (m_Metalness != 0.f)
+			{
+				f0 = m_Albedo;
+				kd = ColorRGB{0,0,0};
+			}
+			
+			ColorRGB ks{ 1 - kd.r,1 - kd.g,1 - kd.b };
+			ColorRGB cookTorrance{	BRDF::NormalDistribution_GGX(hitRecord.normal,h,m_Roughness) * 
+									BRDF::FresnelFunction_Schlick(h,v,f0) * 
+									BRDF::GeometryFunction_Smith(hitRecord.normal,v,l,m_Roughness) };
+
+			const float denominator{ 4 * (Vector3::Dot(v,hitRecord.normal)) * (Vector3::Dot(l,hitRecord.normal)) };
+
+			cookTorrance.r /= denominator;
+			cookTorrance.g /= denominator;
+			cookTorrance.b /= denominator;
+
+			return kd * BRDF::Lambert(kd,m_Albedo) + ks * cookTorrance;
+
 		}
 
 	private:
