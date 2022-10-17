@@ -174,10 +174,36 @@ namespace dae
 
 		inline ColorRGB GetRadiance(const Light& light, const Vector3& target)
 		{
-			//todo W3
-			assert(false && "No Implemented Yet!");
-			return {};
+			//todo W3 DONE
+			if (light.type == LightType::Point)
+			{
+				return (light.color * (light.intensity / ((light.origin - target).SqrMagnitude())));
+			}
+			else if (light.type == LightType::Directional)
+			{
+				return (light.color * (light.intensity));
+			}
+			else
+			{
+				return {};
+			}
 		}
+
+		inline float GetLambertCosine(const Vector3& surfaceNormal, const Vector3& lightDirectionNormalized)
+		{
+			const float temp{ Vector3::Dot(surfaceNormal, lightDirectionNormalized) };
+			constexpr float epsilon{ 0.01f }; //might need to tweak this value
+			if (temp > epsilon)
+			{
+				return temp;
+			}
+			else
+			{
+				return 0.f;
+			}
+		}
+
+
 	}
 
 	namespace Utils

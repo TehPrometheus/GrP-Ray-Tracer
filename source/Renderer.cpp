@@ -1,6 +1,7 @@
 //External includes
 #include "SDL.h"
 #include "SDL_surface.h"
+#include "SDL_events.h"
 
 //Project includes
 #include "Renderer.h"
@@ -15,7 +16,8 @@ using namespace dae;
 
 Renderer::Renderer(SDL_Window * pWindow) :
 	m_pWindow(pWindow),
-	m_pBuffer(SDL_GetWindowSurface(pWindow))
+	m_pBuffer(SDL_GetWindowSurface(pWindow)),
+	m_AreShadowsEnabled{true}
 {
 	//Initialize
 	SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
@@ -25,13 +27,13 @@ Renderer::Renderer(SDL_Window * pWindow) :
 
 }
 
-void Renderer::Render(Scene* pScene) const
+void Renderer::Render(Scene* pScene) 
 {
 	Camera& camera = pScene->GetCamera();
 	auto& materials = pScene->GetMaterials();
 	auto& lights = pScene->GetLights();
 	Vector3 rayDirection(0,0,0);
-
+	const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
 	for (int px{}; px < m_Width; ++px)
 	{
 		for (int py{}; py < m_Height; ++py)
@@ -43,38 +45,69 @@ void Renderer::Render(Scene* pScene) const
 			const float	c_x{ ((2 * px_c) - m_WidthFloat) * camera.FOV / m_WidthFloat },
 						c_y{ 1 - ((2 * py_c) * camera.FOV / m_WidthFloat) };
 
-			// Make appropriate ray
+			// Make appropriate ray & normalize
 			rayDirection.x = c_x;
 			rayDirection.y = c_y;
 			rayDirection.z = 1.f;
-
 			rayDirection = rayDirection.Normalized();
 
+			// Camera space to world space
 			const Matrix cameraToWorld = camera.CalculateCameraToWorld();
 			rayDirection = cameraToWorld.TransformVector(rayDirection);
 
+			//Create & fill in hit record with the current view ray
 			ColorRGB finalColor{};
 			Ray viewRay{ camera.origin , rayDirection };
 			HitRecord closestHit{};
-			//Plane testPlane{ {0.f,-50.f,0.f },{0.f,1.f,0.f }, 0 };
-			//GeometryUtils::HitTest_Plane(testPlane, hitRay, closestHit);
 			pScene->GetClosestHit(viewRay, closestHit);
 
 
-			//Give pixel appropriate color
-			if (closestHit.didHit)
-			{
-				finalColor = materials[closestHit.materialIndex]->Shade();
-				for (size_t lightIdx = 0; lightIdx < lights.size(); lightIdx++)
+			//If we hit something, give it it's appropriate color
+				//Loop over the lights & apply the rendering equation
+				for (size_t lightIdx = 0; lightIdx < lights.size(); ++lightIdx)
 				{
-					Vector3 directionToLight = LightUtils::GetDirectionToLight(lights[lightIdx], closestHit.origin + closestHit.normal * 0.01f);
-					Ray lightRay{ closestHit.origin + closestHit.normal * 0.01f, directionToLight.Normalized(), 0.0001f, directionToLight.Magnitude() };
-					if (pScene->DoesHit(lightRay))
+					if (closestHit.didHit)
 					{
-						finalColor * 0.5f;
+						Vector3 directionToLight = LightUtils::GetDirectionToLight(lights[lightIdx], closestHit.origin + closestHit.normal * 0.01f);
+						const float LambertCosine{ LightUtils::GetLambertCosine(closestHit.normal, directionToLight.Normalized()) };
+						if (LambertCosine != 0.f)
+						{
+							switch (m_CurrentLightingMode)
+							{
+							case LightingMode::ObservedArea:
+								{
+									finalColor += ColorRGB{ LambertCosine ,LambertCosine ,LambertCosine };
+									break;
+								}
+							case LightingMode::Radiance:
+								{
+									finalColor += LightUtils::GetRadiance(lights[lightIdx], closestHit.origin);
+									break;
+								}
+							case LightingMode::BRDF:
+								{
+									finalColor += materials[closestHit.materialIndex]->Shade(closestHit, directionToLight.Normalized(), -viewRay.direction);
+									break;
+								}
+							case LightingMode::Combined:
+								{
+									finalColor += LightUtils::GetRadiance(lights[lightIdx], closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit, directionToLight.Normalized(), -viewRay.direction) * LambertCosine;
+									
+									break;
+								}
+							}
+							//Apply shadows
+							if (m_AreShadowsEnabled)
+							{
+								Ray lightRay{ closestHit.origin + closestHit.normal * 0.01f, directionToLight.Normalized(), 0.0001f, directionToLight.Magnitude() };
+								if (pScene->DoesHit(lightRay))
+								{
+									finalColor *= 0.5f;
+								}
+							}
+						}
 					}
 				}
-			}
 
 			//Update Color in Buffer
 			finalColor.MaxToOne();
@@ -94,5 +127,23 @@ void Renderer::Render(Scene* pScene) const
 bool Renderer::SaveBufferToImage() const
 {
 	return SDL_SaveBMP(m_pBuffer, "RayTracing_Buffer.bmp");
+}
+
+void Renderer::ProcessKeyUpEvent(const SDL_Event& e)
+{
+	switch (e.key.keysym.scancode)
+	{
+	case SDL_SCANCODE_F1:
+		m_AreShadowsEnabled = !m_AreShadowsEnabled;
+		break;
+	case SDL_SCANCODE_F2:
+		m_CurrentLightingMode = static_cast<LightingMode>((static_cast<int>(m_CurrentLightingMode) + 1) % 4);
+		break;
+	}
+}
+
+void dae::Renderer::ToggleShadows()
+{
+	m_AreShadowsEnabled = !m_AreShadowsEnabled;
 }
 

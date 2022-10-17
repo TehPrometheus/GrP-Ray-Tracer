@@ -21,9 +21,19 @@ namespace dae
 		Renderer& operator=(const Renderer&) = delete;
 		Renderer& operator=(Renderer&&) noexcept = delete;
 
-		void Render(Scene* pScene) const;
+		void Render(Scene* pScene) ;
 		bool SaveBufferToImage() const;
+		void ProcessKeyUpEvent(const SDL_Event& e);
+		void ToggleShadows();
 
+		enum class LightingMode
+		{
+			ObservedArea = 0, //Lambert Cosine Law
+			Radiance = 1, //Incident Radiance
+			BRDF = 2, //Scattering of the light
+			Combined = 3 // ObservedArea*Radiance*BRDF
+		};
+		LightingMode m_CurrentLightingMode{ LightingMode::Combined };
 	private:
 		SDL_Window* m_pWindow{};
 
@@ -34,5 +44,6 @@ namespace dae
 		int m_Height{};
 		float m_WidthFloat{};
 		float m_HeightFloat{};
+		bool m_AreShadowsEnabled{};
 	};
 }
