@@ -24,7 +24,6 @@ namespace dae
 		void Render(Scene* pScene) ;
 		bool SaveBufferToImage() const;
 		void ProcessKeyUpEvent(const SDL_Event& e);
-		void ToggleShadows();
 
 		enum class LightingMode
 		{
@@ -35,8 +34,10 @@ namespace dae
 		};
 		LightingMode m_CurrentLightingMode{ LightingMode::Combined };
 	private:
+		void ToggleShadows();
+		void TogglelightingMode();
+		void PrintCurrentSceneState() const;
 		SDL_Window* m_pWindow{};
-
 		SDL_Surface* m_pBuffer{};
 		uint32_t* m_pBufferPixels{};
 

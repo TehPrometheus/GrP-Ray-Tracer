@@ -39,7 +39,7 @@ void Renderer::Render(Scene* pScene)
 		for (int py{}; py < m_Height; ++py)
 		{
 			// Raster space to camera space
-			const float	px_c{ px + 0.5f }, 
+			const float	px_c{ float(px) + 0.5f }, 
 					py_c{ py + 0.5f };
 				  
 			const float	c_x{ ((2 * px_c) - m_WidthFloat) * camera.FOV / m_WidthFloat },
@@ -134,16 +134,56 @@ void Renderer::ProcessKeyUpEvent(const SDL_Event& e)
 	switch (e.key.keysym.scancode)
 	{
 	case SDL_SCANCODE_F2:
-		m_AreShadowsEnabled = !m_AreShadowsEnabled;
+		ToggleShadows();
 		break;
 	case SDL_SCANCODE_F3:
-		m_CurrentLightingMode = static_cast<LightingMode>((static_cast<int>(m_CurrentLightingMode) + 1) % 4);
+		TogglelightingMode();
+		break;
+	default:
 		break;
 	}
+
+	PrintCurrentSceneState();
+
 }
+
 
 void dae::Renderer::ToggleShadows()
 {
 	m_AreShadowsEnabled = !m_AreShadowsEnabled;
+}
+
+void dae::Renderer::TogglelightingMode()
+{
+	m_CurrentLightingMode = static_cast<LightingMode>((static_cast<int>(m_CurrentLightingMode) + 1) % 4);
+}
+
+void dae::Renderer::PrintCurrentSceneState() const 
+{
+	if (m_AreShadowsEnabled)
+	{
+		std::cout << "Shadows are enabled" << "\n";
+	}
+	else
+	{
+		std::cout << "Shadows are disabled" << "\n";
+	}
+	switch (m_CurrentLightingMode)
+	{
+	case LightingMode::ObservedArea:
+		std::cout << "Lighting mode is set to ObservedArea" << "\n";
+		break;
+	case LightingMode::Radiance:
+		std::cout << "Lighting mode is set to Radiance" << "\n";
+		break;
+	case LightingMode::BRDF:
+		std::cout << "Lighting mode is set to BRDF" << "\n";
+		break;
+	case LightingMode::Combined:
+		std::cout << "Lighting mode is set to Combined" << "\n";
+		break;
+	default:
+		break;
+	}
 }
 
