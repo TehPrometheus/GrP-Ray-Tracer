@@ -24,7 +24,7 @@ namespace dae
 		}
 
 		const float movementSpeed{ 20.f };
-		const float rotationSpeed{ 2.f };
+		const float rotationSpeed{ 200.f };
 		Vector3 origin{};
 		float fovAngle{45.f};
 		float FOV{};
@@ -44,6 +44,12 @@ namespace dae
 			//todo W2 DONE
 			right = Vector3::Cross(Vector3::UnitY, forward).Normalized();
 			up = Vector3::Cross(forward, right).Normalized();
+
+			Matrix rotationMatrix = Matrix::CreateRotationX(totalPitch * TO_RADIANS) * Matrix::CreateRotationY(totalYaw * TO_RADIANS);
+
+			forward = rotationMatrix.GetAxisZ();
+			right = rotationMatrix.GetAxisX();
+			up = rotationMatrix.GetAxisY();
 
 			Matrix ONB{
 			Vector4{ right, 0.f},
@@ -139,8 +145,7 @@ namespace dae
 				}
 			}
 
-			const Matrix finalRotation{ Matrix::CreateRotation({ totalPitch, totalYaw, 0 }) };
-			forward = finalRotation.TransformVector(Vector3::UnitZ);
+			cameraToWorld = CalculateCameraToWorld();
 			//todo: W2 DONE
 		}
 	};
