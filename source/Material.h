@@ -110,26 +110,30 @@ namespace dae
 			//todo: W3 DONE
 			ColorRGB f0{ 0.04f, 0.04f, 0.04f };
 			const Vector3 h{ (v + l) / (v + l).Magnitude() };
-			ColorRGB kd{ ColorRGB{1,1,1} - BRDF::FresnelFunction_Schlick(h,v,f0) };
-
-			if (m_Metalness != 0.f)
+			ColorRGB kd{0,0,0};
+			if (m_Metalness > 0.f)
 			{
 				f0 = m_Albedo;
-				kd = ColorRGB{0,0,0};
 			}
-			
-			ColorRGB ks{ 1 - kd.r,1 - kd.g,1 - kd.b };
-			ColorRGB cookTorrance{	BRDF::NormalDistribution_GGX(hitRecord.normal,h,m_Roughness) * 
-									BRDF::FresnelFunction_Schlick(h,v,f0) * 
-									BRDF::GeometryFunction_Smith(hitRecord.normal,v,l,m_Roughness) };
 
-			const float denominator{ 4 * (Vector3::Dot(v,hitRecord.normal)) * (Vector3::Dot(l,hitRecord.normal)) };
+			ColorRGB F = BRDF::FresnelFunction_Schlick(h, v, f0);
+			float D = BRDF::NormalDistribution_GGX(hitRecord.normal, h, m_Roughness);
+			float G = BRDF::GeometryFunction_Smith(hitRecord.normal, v, l, m_Roughness);
+			ColorRGB cookTorrance{D * F * G};
+			const float denominator{ 4 * (std::max(0.f,Vector3::Dot(v,hitRecord.normal))) * std::max(0.f,Vector3::Dot(l,hitRecord.normal)) };
+
+			if (m_Metalness == 0.f)
+			{
+				kd.r = 1 - F.r;
+				kd.g = 1 - F.g;
+				kd.b = 1 - F.b;
+			}
 
 			cookTorrance.r /= denominator;
 			cookTorrance.g /= denominator;
 			cookTorrance.b /= denominator;
 
-			return kd * BRDF::Lambert(kd,m_Albedo) + ks * cookTorrance;
+			return BRDF::Lambert(kd,m_Albedo) + cookTorrance;
 
 		}
 

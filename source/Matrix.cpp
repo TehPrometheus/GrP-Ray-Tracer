@@ -167,7 +167,7 @@ namespace dae {
 
 	Matrix Matrix::CreateScale(float sx, float sy, float sz)
 	{
-		//todo W2 
+		//todo W2
 		assert(false && "Not Implemented Yet");
 		return {};
 	}

@@ -32,7 +32,7 @@ namespace dae
 			BRDF = 2, //Scattering of the light
 			Combined = 3 // ObservedArea*Radiance*BRDF
 		};
-		LightingMode m_CurrentLightingMode{ LightingMode::Combined };
+		LightingMode m_CurrentLightingMode{ LightingMode::BRDF };
 	private:
 		void ToggleShadows();
 		void TogglelightingMode();

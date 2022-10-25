@@ -11,19 +11,23 @@ namespace dae
 {
 	struct Camera
 	{
-		Camera() = default;
+		Camera()
+		{
+			FOV = tanf((fovAngle * TO_RADIANS) / 2.f);
+		}
 
 		Camera(const Vector3& _origin, float _fovAngle):
 			origin{_origin},
 			fovAngle{_fovAngle}
 		{
+			FOV = tanf((fovAngle * TO_RADIANS) / 2.f);
 		}
 
 		const float movementSpeed{ 20.f };
 		const float rotationSpeed{ 2.f };
 		Vector3 origin{};
-		float fovAngle{90.f};
-		float FOV = tanf((fovAngle * TO_RADIANS) / 2.f);
+		float fovAngle{45.f};
+		float FOV{};
 
 		Vector3 forward{Vector3::UnitZ};
 		Vector3 up{Vector3::UnitY};
