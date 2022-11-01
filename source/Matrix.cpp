@@ -105,8 +105,12 @@ namespace dae {
 	Matrix Matrix::CreateTranslation(float x, float y, float z)
 	{
 		//todo W1
-		assert(false && "Not Implemented Yet");
-		return {};
+		Vector4 line1{ 1, 0, 0, x };
+		Vector4 line2{ 0, 1, 0, y };
+		Vector4 line3{ 0, 0, 0, z };
+		Vector4 line4{ 0, 0, 0, 1 };
+		Matrix matrixTranslation{ line1, line2, line3, line4 };
+		return matrixTranslation;
 	}
 
 	Matrix Matrix::CreateTranslation(const Vector3& t)
@@ -122,7 +126,7 @@ namespace dae {
 			Vector4{1.f,	0.f,			0.f,		0.f},
 			Vector4{0.f,	cosf(pitch), -sinf(pitch),	0.f},
 			Vector4{0.f,	sinf(pitch),  cosf(pitch),	0.f},
-			Vector4{3.f,	 0.f,			0.f,		1.f}
+			Vector4{0.f,	 0.f,			0.f,		1.f}
 		};
 		return m;
 	}
@@ -132,10 +136,10 @@ namespace dae {
 		//todo W2 DONE
 		Matrix m
 		{
-			Vector4{cos(yaw),	0.f,-sin(yaw),	0.f},
+			Vector4{cosf(yaw),	0.f,-sinf(yaw),	0.f},
 			Vector4{0.f,		1.f,	0.f,	0.f},
-			Vector4{sin(yaw),	0.f, cos(yaw),	0.f},
-			Vector4{0.f,		3.f,	0.f,	1.f}
+			Vector4{sinf(yaw),	0.f, cosf(yaw),	0.f},
+			Vector4{0.f,		0.f,	0.f,	1.f}
 		};
 		return m;
 	}
@@ -145,10 +149,10 @@ namespace dae {
 		//todo W2 DONE
 		Matrix m
 		{
-			Vector4{ cos(roll), sin(roll),	0.f, 0.f},
-			Vector4{-sin(roll), cos(roll),	0.f, 0.f},
+			Vector4{ cosf(roll), sinf(roll),	0.f, 0.f},
+			Vector4{-sinf(roll), cosf(roll),	0.f, 0.f},
 			Vector4{	0.f,		0.f,	1.f, 0.f},
-			Vector4{	0.f,		0.f,	3.f, 1.f}
+			Vector4{	0.f,		0.f,	0.f, 1.f}
 		};
 		return m;
 	}
@@ -168,8 +172,14 @@ namespace dae {
 	Matrix Matrix::CreateScale(float sx, float sy, float sz)
 	{
 		//todo W2
-		assert(false && "Not Implemented Yet");
-		return {};
+		Matrix m
+		{
+			Vector4{sx ,0.f,0.f, 0.f},
+			Vector4{0.f,sy ,0.f, 0.f},
+			Vector4{0.f,0.f,sz, 0.f},
+			Vector4{0.f,0.f,0.f, 1.f}
+		};
+		return m;
 	}
 
 	Matrix Matrix::CreateScale(const Vector3& s)

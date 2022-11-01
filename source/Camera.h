@@ -24,7 +24,7 @@ namespace dae
 		}
 
 		const float movementSpeed{ 20.f };
-		const float rotationSpeed{ 200.f };
+		const float rotationSpeed{ 100.f };
 		Vector3 origin{};
 		float fovAngle{45.f};
 		float FOV{};
@@ -37,7 +37,7 @@ namespace dae
 		float totalYaw{0.f};
 
 		Matrix cameraToWorld{};
-
+		
 
 		Matrix CalculateCameraToWorld()
 		{
@@ -50,7 +50,7 @@ namespace dae
 			forward = rotationMatrix.GetAxisZ();
 			right = rotationMatrix.GetAxisX();
 			up = rotationMatrix.GetAxisY();
-
+			
 			Matrix ONB{
 			Vector4{ right, 0.f},
 			Vector4{ up, 0.f},
