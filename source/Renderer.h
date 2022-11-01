@@ -11,9 +11,10 @@ struct ColorRGB;
 namespace dae
 {
 	class Scene;
-	class Camera;
 	class Material;
+
 	struct Light;
+	struct Camera;
 
 	class Renderer final
 	{
@@ -51,8 +52,6 @@ namespace dae
 
 		int m_Width{};
 		int m_Height{};
-		float m_WidthFloat{};
-		float m_HeightFloat{};
 		bool m_AreShadowsEnabled{};
 	};
 }

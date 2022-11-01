@@ -50,7 +50,7 @@ namespace dae
 		std::vector<TriangleMesh> m_TriangleMeshGeometries{};
 		std::vector<Light> m_Lights{};
 		std::vector<Material*> m_Materials{};
-
+		std::vector<Triangle> m_Triangles{};
 		Camera m_Camera{};
 
 		Sphere* AddSphere(const Vector3& origin, float radius, unsigned char materialIndex = 0);
@@ -115,6 +115,24 @@ namespace dae
 		Scene_W4_TestScene& operator=(Scene_W4_TestScene&&) noexcept = delete;
 
 		void Initialize() override;
+	};
+	class Scene_W4_ReferenceScene final : public Scene
+	{
+	public:
+		Scene_W4_ReferenceScene() = default;
+		~Scene_W4_ReferenceScene() override = default;
+
+		Scene_W4_ReferenceScene(const Scene_W4_ReferenceScene&) = delete;
+		Scene_W4_ReferenceScene(Scene_W4_ReferenceScene&&) noexcept = delete;
+		Scene_W4_ReferenceScene& operator=(const Scene_W4_ReferenceScene&) = delete;
+		Scene_W4_ReferenceScene& operator=(Scene_W4_ReferenceScene&&) noexcept = delete;
+
+		void Initialize() override;
+		void Update(Timer* pTimer) override;
+
+	private:
+		TriangleMesh* m_pMeshes[3]{};
+		TriangleMesh* m_pBunnyMesh{nullptr};
 	};
 
 }

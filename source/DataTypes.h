@@ -92,9 +92,19 @@ namespace dae
 			translationTransform = Matrix::CreateTranslation(translation);
 		}
 
+		void RotateX(float pitch)
+		{
+			rotationTransform = Matrix::CreateRotationX(pitch);
+		}
+
 		void RotateY(float yaw)
 		{
 			rotationTransform = Matrix::CreateRotationY(yaw);
+		}
+
+		void RotateZ(float rool)
+		{
+			rotationTransform = Matrix::CreateRotationZ(rool);
 		}
 
 		void Scale(const Vector3& scale)
@@ -106,15 +116,15 @@ namespace dae
 		{
 			int startIndex = static_cast<int>(positions.size());
 
-			positions.push_back(triangle.v0);
-			positions.push_back(triangle.v1);
-			positions.push_back(triangle.v2);
+			positions.emplace_back(triangle.v0);
+			positions.emplace_back(triangle.v1);
+			positions.emplace_back(triangle.v2);
 
-			indices.push_back(startIndex);
-			indices.push_back(++startIndex);
-			indices.push_back(++startIndex);
+			indices.emplace_back(  startIndex);
+			indices.emplace_back(++startIndex);
+			indices.emplace_back(++startIndex);
 
-			normals.push_back(triangle.normal);
+			normals.emplace_back(triangle.normal);
 
 			//Not ideal, but making sure all vertices are updated
 			if(!ignoreTransformUpdate)
@@ -123,20 +133,38 @@ namespace dae
 
 		void CalculateNormals()
 		{
-			assert(false && "No Implemented Yet!");
+			Vector3 edgeA{}, edgeB{}, normal{};
+			for (int idx{}; idx < indices.size(); idx += 3)
+			{
+				edgeA = positions[indices[idx + 1]] - positions[indices[idx]];
+				edgeB = positions[indices[idx + 2]] - positions[indices[idx]];
+				normal = Vector3::Cross(edgeA, edgeB).Normalized();
+				normals.emplace_back(normal);
+			}
 		}
 
 		void UpdateTransforms()
 		{
-			assert(false && "No Implemented Yet!");
-			//Calculate Final Transform 
-			//const auto finalTransform = ...
+			//Calculate Final Transform
+			Matrix finalTransform = scaleTransform;
+			finalTransform *= rotationTransform;
+			finalTransform *= translationTransform;
 
-			//Transform Positions (positions > transformedPositions)
-			//...
+			transformedPositions.clear();
+			transformedPositions.reserve(positions.size());
 
-			//Transform Normals (normals > transformedNormals)
-			//...
+			for (size_t i{0}; i < positions.size(); ++i)
+			{
+				transformedPositions.emplace_back(finalTransform.TransformPoint(positions[i]));
+			}
+
+			transformedNormals.clear();
+			transformedNormals.reserve(normals.size());
+
+			for (size_t i{ 0 }; i < normals.size(); ++i)
+			{
+				transformedNormals.emplace_back(finalTransform.TransformVector(normals[i]));
+			}
 		}
 	};
 #pragma endregion
