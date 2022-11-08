@@ -132,6 +132,22 @@ namespace dae
 
 	private:
 		TriangleMesh* m_pMeshes[3]{};
+	};
+	class Scene_W4_Bunny final : public Scene
+	{
+	public:
+		Scene_W4_Bunny() = default;
+		~Scene_W4_Bunny() override = default;
+
+		Scene_W4_Bunny(const Scene_W4_Bunny&) = delete;
+		Scene_W4_Bunny(Scene_W4_Bunny&&) noexcept = delete;
+		Scene_W4_Bunny& operator=(const Scene_W4_Bunny&) = delete;
+		Scene_W4_Bunny& operator=(Scene_W4_Bunny&&) noexcept = delete;
+
+		void Initialize() override;
+		void Update(Timer* pTimer) override;
+
+	private:
 		TriangleMesh* m_pBunnyMesh{nullptr};
 	};
 

@@ -113,10 +113,10 @@ void dae::Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, f
 	Vector3 rayDirection(0, 0, 0);
 	// Raster space to camera space
 	const float	px_c{ float(px) + 0.5f },
-		py_c{ py + 0.5f };
+				py_c{ py + 0.5f };
 
 	const float	c_x{ ((2 * (px_c / float(m_Width)) - 1) * aspectRatio * camera.FOV) },
-		c_y{ (1 - (2 * (py_c / float(m_Height)))) * camera.FOV };
+				c_y{ (1 - (2 * (py_c / float(m_Height)))) * camera.FOV };
 
 	// Make appropriate ray & normalize
 	rayDirection.x = c_x;
