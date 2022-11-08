@@ -333,12 +333,6 @@ namespace dae {
 		AddPlane({ 5.f, 0.f, 0.f }, { -1.f, 0.f, 0.f }, matLambert_GreyBlue);
 		AddPlane({ -5.f, 0.f, 0.f }, { 1.f, 0.f, 0.f }, matLambert_GreyBlue);
 
-		//m_pBunnyMesh = AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLambert_White);
-		//Utils::ParseOBJ("Resources/lowpoly_bunny2.obj", m_pBunnyMesh->positions,m_pBunnyMesh->normals,m_pBunnyMesh->indices);
-		//m_pBunnyMesh->Scale({ 2.f, 2.f, 2.f });
-		//m_pBunnyMesh->UpdateTransforms();
-
-
 		AddSphere({ -1.75f, 1.f, 0.f }, 0.75f,  matCT_GreyRoughMetal);
 		AddSphere({ 0.f, 1.f, 0.f }, 0.75f,		matCT_GreyMediumMetal);
 		AddSphere({ 1.75f, 1.f, 0.f }, 0.75f,   matCT_GreySmoothMetal);
@@ -353,6 +347,7 @@ namespace dae {
 		m_pMeshes[idx] = AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLambert_White);
 		m_pMeshes[idx]->AppendTriangle(baseTriangle, true);
 		m_pMeshes[idx]->Translate({-1.75f, 4.5f, 0.f});
+		m_pMeshes[idx]->UpdateAABB();
 		m_pMeshes[idx]->UpdateTransforms();
 
 		++idx;
@@ -360,6 +355,7 @@ namespace dae {
 		m_pMeshes[idx] = AddTriangleMesh(TriangleCullMode::NoCulling, matLambert_White);
 		m_pMeshes[idx]->AppendTriangle(baseTriangle, true);
 		m_pMeshes[idx]->Translate({0.f, 4.5f, 0.f});
+		m_pMeshes[idx]->UpdateAABB();
 		m_pMeshes[idx]->UpdateTransforms();
 
 		++idx;
@@ -367,7 +363,9 @@ namespace dae {
 		m_pMeshes[idx] = AddTriangleMesh(TriangleCullMode::FrontFaceCulling, matLambert_White);
 		m_pMeshes[idx]->AppendTriangle(baseTriangle, true);
 		m_pMeshes[idx]->Translate({1.75f, 4.5f, 0.f});
+		m_pMeshes[idx]->UpdateAABB();
 		m_pMeshes[idx]->UpdateTransforms();
+
 
 		AddPointLight({	  0.f,  5.f,  5.f }	, 50.f, ColorRGB{	1.f, 0.61f, 0.45f });
 		AddPointLight({ -2.5f,  5.f, -5.f }	, 70.f, ColorRGB{	1.f,  0.8f, 0.45f });
@@ -377,9 +375,6 @@ namespace dae {
 	{
 		Scene::Update(pTimer);
 
-		//m_pBunnyMesh->RotateY(PI_DIV_2 * pTimer->GetTotal());
-		//m_pBunnyMesh->UpdateTransforms();
-
 		const float yawAngle{ (cosf(pTimer->GetTotal()) + 1.f) / 2.f * PI_2 };
 		for (const auto& mesh : m_pMeshes)
 		{
@@ -387,6 +382,39 @@ namespace dae {
 			mesh->UpdateTransforms();
 		}
 
+	}
+	void Scene_W4_Bunny::Initialize()
+	{
+		sceneName = "Bunny Scene";
+		m_Camera.origin = { 0.f, 3.f, -9.f };
+		m_Camera.fovAngle = 45.f;
+		const auto matLambert_GreyBlue = AddMaterial(new Material_Lambert{ {0.49f, 0.57f, 0.57f}, 1.f });
+		const auto matLambert_White = AddMaterial(new Material_Lambert{ colors::White, 1.f });
+
+
+		AddPlane({ 0.f, 0.f, 10.f }, { 0.f, 0.f, -1.f }, matLambert_GreyBlue);
+		AddPlane({ 0.f, 0.f, 0.f }, { 0.f, 1.f, 0.f }, matLambert_GreyBlue);
+		AddPlane({ 0.f, 10.f, 0.f }, { 0.f, -1.f, 0.f }, matLambert_GreyBlue);
+		AddPlane({ 5.f, 0.f, 0.f }, { -1.f, 0.f, 0.f }, matLambert_GreyBlue);
+		AddPlane({ -5.f, 0.f, 0.f }, { 1.f, 0.f, 0.f }, matLambert_GreyBlue);
+
+		m_pBunnyMesh = AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLambert_White);
+		Utils::ParseOBJ("Resources/lowpoly_bunny2.obj", m_pBunnyMesh->positions,m_pBunnyMesh->normals,m_pBunnyMesh->indices);
+		m_pBunnyMesh->Scale({ 2.f, 2.f, 2.f });
+		m_pBunnyMesh->UpdateAABB();
+		m_pBunnyMesh->UpdateTransforms();
+
+
+		AddPointLight({	  0.f,  5.f,  5.f }	, 50.f, ColorRGB{	1.f, 0.61f, 0.45f });
+		AddPointLight({ -2.5f,  5.f, -5.f }	, 70.f, ColorRGB{	1.f,  0.8f, 0.45f });
+		AddPointLight({  2.5f, 2.5f, -5.f }	, 50.f, ColorRGB{ 0.34f, 0.47f, 0.68f });
+	}
+	void Scene_W4_Bunny::Update(Timer* pTimer)
+	{
+		Scene::Update(pTimer);
+
+		m_pBunnyMesh->RotateY(PI_DIV_2 * pTimer->GetTotal());
+		m_pBunnyMesh->UpdateTransforms();
 	}
 #pragma endregion
 
