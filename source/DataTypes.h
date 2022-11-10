@@ -160,17 +160,17 @@ namespace dae
 			transformedPositions.clear();
 			transformedPositions.reserve(positions.size());
 
-			for (size_t i{0}; i < positions.size(); ++i)
+			for (const auto& position : positions)
 			{
-				transformedPositions.emplace_back(finalTransform.TransformPoint(positions[i]));
+				transformedPositions.emplace_back(finalTransform.TransformPoint(position));
 			}
 
 			transformedNormals.clear();
 			transformedNormals.reserve(normals.size());
 
-			for (size_t i{ 0 }; i < normals.size(); ++i)
+			for (const auto& normal : normals)
 			{
-				transformedNormals.emplace_back(finalTransform.TransformVector(normals[i]));
+				transformedNormals.emplace_back(rotationTransform.TransformVector(normal));
 			}
 
 			UpdateTransformedAABB(finalTransform);
@@ -182,10 +182,10 @@ namespace dae
 			{
 				minAABB = positions[0];
 				maxAABB = positions[0];
-				for (size_t i{ 0 }; i < positions.size(); ++i)
+				for (const auto& position : positions)
 				{
-					minAABB = Vector3::Min(positions[i], minAABB);
-					maxAABB = Vector3::Max(positions[i], maxAABB);
+					minAABB = Vector3::Min(position, minAABB);
+					maxAABB = Vector3::Max(position, maxAABB);
 				}
 			}
 		}

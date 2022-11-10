@@ -121,11 +121,13 @@ namespace dae {
 	Matrix Matrix::CreateRotationX(float pitch)
 	{
 		//todo W2 DONE
+		const float cosine{ cosf(pitch) };
+		const float sine{ sinf(pitch) };
 		Matrix m
 		{
 			Vector4{1.f,	0.f,			0.f,		0.f},
-			Vector4{0.f,	cosf(pitch), -sinf(pitch),	0.f},
-			Vector4{0.f,	sinf(pitch),  cosf(pitch),	0.f},
+			Vector4{0.f,	cosine, -sine,	0.f},
+			Vector4{0.f,	sine,  cosine,	0.f},
 			Vector4{0.f,	 0.f,			0.f,		1.f}
 		};
 		return m;
@@ -134,11 +136,13 @@ namespace dae {
 	Matrix Matrix::CreateRotationY(float yaw)
 	{
 		//todo W2 DONE
+		const float cosine{ cosf(yaw) };
+		const float sine{ sinf(yaw) };
 		Matrix m
 		{
-			Vector4{cosf(yaw),	0.f,-sinf(yaw),	0.f},
+			Vector4{cosine,	0.f,-sine,	0.f},
 			Vector4{0.f,		1.f,	0.f,	0.f},
-			Vector4{sinf(yaw),	0.f, cosf(yaw),	0.f},
+			Vector4{sine,	0.f, cosine,	0.f},
 			Vector4{0.f,		0.f,	0.f,	1.f}
 		};
 		return m;
@@ -147,10 +151,12 @@ namespace dae {
 	Matrix Matrix::CreateRotationZ(float roll)
 	{
 		//todo W2 DONE
+		const float cosine{ cosf(roll) };
+		const float sine{ sinf(roll) };
 		Matrix m
 		{
-			Vector4{ cosf(roll), sinf(roll),	0.f, 0.f},
-			Vector4{-sinf(roll), cosf(roll),	0.f, 0.f},
+			Vector4{ cosine, sine,	0.f, 0.f},
+			Vector4{-sine, cosine,	0.f, 0.f},
 			Vector4{	0.f,		0.f,	1.f, 0.f},
 			Vector4{	0.f,		0.f,	0.f, 1.f}
 		};

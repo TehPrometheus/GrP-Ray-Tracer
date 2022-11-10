@@ -10,98 +10,89 @@ namespace dae
 	{
 #pragma region Sphere HitTest
 		//SPHERE HIT-TESTS
-		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
-		{
-			//todo W1 DONE
-			// Analytical Solution
-				//float	A{ Vector3::Dot(ray.direction,ray.direction) },
-				//		B{ Vector3::Dot(2 * ray.direction,(ray.origin - sphere.origin)) },
-				//		C{ Vector3::Dot((ray.origin - sphere.origin),(ray.origin - sphere.origin)) - Square(sphere.radius) },
-				//		D{ Square(B) - 4 * A * C };
-
-				//float	t_0{ (-B - sqrtf(D)) / (2 * A) };
-
-				//Vector3 hitPoint{};
-				//Vector3 hitNormal{};
-
-				//if (D > 0)
-				//{
-				//	hitRecord.didHit = true;
-				//	if (t_0 > ray.min && t_0 < ray.max)
-				//	{
-				//		hitRecord.t = t_0;
-				//		hitRecord.origin = ray.origin + t_0 * ray.direction;
-				//		hitPoint = ray.origin + t_0 * ray.direction;
-				//		hitNormal = hitPoint - sphere.origin;
-				//		hitRecord.normal = hitNormal.Normalized();
-				//		hitRecord.materialIndex = sphere.materialIndex;
-				//		return true;
-				//	}
-				//	else
-				//	{
-				//		float t_1{ (-B + sqrtf(D)) / (2 * A) };
-				//		if (t_1 > ray.min && t_1 < ray.max)
-				//		{
-				//			hitRecord.t = t_1;
-				//			hitRecord.origin = ray.origin + t_1 * ray.direction;
-				//			hitPoint = ray.origin + t_1 * ray.direction;
-				//			hitNormal = hitPoint - sphere.origin;
-				//			hitRecord.normal = hitNormal.Normalized();
-				//			hitRecord.materialIndex = sphere.materialIndex;
-				//			return true;
-				//		}
-				//	}
-				//}
-				//else
-				//{
-				//	hitRecord.didHit = false;
-				//	return false;
-				//}
-			
-
-			// Geometric Solution
-			Vector3 hitNormal{};
-			Vector3 L{ sphere.origin - ray.origin };
-			float dp{ Vector3::Dot(L,ray.direction) };
-
-			float od_squared{ L.SqrMagnitude() - (dp*dp) };
+		inline bool HitTest_Sphere_Geometric(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
+		{           
+			const Vector3 L{ sphere.origin - ray.origin };
+			const float dp{ Vector3::Dot(L,ray.direction) };
+			const float od_squared{ L.SqrMagnitude() - (dp*dp) };
 
 			if (od_squared < (sphere.radius * sphere.radius) )
 			{
-				float t_ca{ sqrtf(Square(sphere.radius) - od_squared) };
-				if ((dp - t_ca) > ray.min && (dp - t_ca) < ray.max)
+				float t{ dp - sqrtf(Square(sphere.radius) - od_squared) };
+				if (t > ray.min && t < ray.max)
 				{
 					if (!ignoreHitRecord)
 					{
 						hitRecord.didHit = true;
-						hitRecord.t = dp - t_ca;
+						hitRecord.t = t;
 						hitRecord.origin = ray.origin + hitRecord.t * ray.direction;
-						hitNormal = hitRecord.origin - sphere.origin;
 						hitRecord.materialIndex = sphere.materialIndex;
-						hitRecord.normal = hitNormal.Normalized();
+						hitRecord.normal = (hitRecord.origin - sphere.origin).Normalized();
 					}
 					return true;
-
 				}
+			}
 
+			return false;
+		}
+
+		inline bool HitTest_Sphere_Geometric(const Sphere& sphere, const Ray& ray)
+		{
+			HitRecord temp{};
+			return HitTest_Sphere_Geometric(sphere, ray, temp, true);
+		}
+		inline bool HitTest_Sphere_Analytical(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
+		{            
+			float	A{ Vector3::Dot(ray.direction,ray.direction) },
+					B{ Vector3::Dot(2 * ray.direction,(ray.origin - sphere.origin)) },
+					C{ Vector3::Dot((ray.origin - sphere.origin),(ray.origin - sphere.origin)) - Square(sphere.radius) },
+					D{ Square(B) - 4 * A * C };
+
+			float	t_0{ (-B - sqrtf(D)) / (2 * A) };
+
+			Vector3 hitPoint{};
+			Vector3 hitNormal{};
+
+			if (D > 0)
+			{
+				hitRecord.didHit = true;
+				if (t_0 > ray.min && t_0 < ray.max)
+				{
+					hitRecord.t = t_0;
+					hitRecord.origin = ray.origin + t_0 * ray.direction;
+					hitPoint = ray.origin + t_0 * ray.direction;
+					hitNormal = hitPoint - sphere.origin;
+					hitRecord.normal = hitNormal.Normalized();
+					hitRecord.materialIndex = sphere.materialIndex;
+					return true;
+				}
 				else
 				{
-					return false;
+					float t_1{ (-B + sqrtf(D)) / (2 * A) };
+					if (t_1 > ray.min && t_1 < ray.max)
+					{
+						hitRecord.t = t_1;
+						hitRecord.origin = ray.origin + t_1 * ray.direction;
+						hitPoint = ray.origin + t_1 * ray.direction;
+						hitNormal = hitPoint - sphere.origin;
+						hitRecord.normal = hitNormal.Normalized();
+						hitRecord.materialIndex = sphere.materialIndex;
+						return true;
+					}
 				}
 			}
 			else
 			{
+				hitRecord.didHit = false;
 				return false;
 			}
-
-
-			
+		
 		}
 
-		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)
+		inline bool HitTest_Sphere_Analytical(const Sphere& sphere, const Ray& ray)
 		{
 			HitRecord temp{};
-			return HitTest_Sphere(sphere, ray, temp, true);
+			return HitTest_Sphere_Analytical(sphere, ray, temp, true);
 		}
 #pragma endregion
 #pragma region Plane HitTest
@@ -134,7 +125,6 @@ namespace dae
 		//TRIANGLE HIT-TESTS
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//todo W5 DONE
 			const float dot{ Vector3::Dot(ray.direction,triangle.normal) };
 
 			//check culling mode first for potential early exit
@@ -239,6 +229,7 @@ namespace dae
 			triangle.materialIndex	= mesh.materialIndex;
 			float distance{ FLT_MAX };
 			HitRecord tempHitRecord{};
+
 			for (size_t index = 0; index < amountOfTriangles; ++index)
 			{
 				triangle.v0				= mesh.transformedPositions[mesh.indices[3 * index]];

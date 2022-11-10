@@ -136,11 +136,11 @@ void dae::Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, f
 
 	//If we hit something, give it it's appropriate color
 		//Loop over the lights & apply the rendering equation
-	for (size_t lightIdx = 0; lightIdx < lights.size(); ++lightIdx)
+	for (const auto& light : lights)
 	{
 		if (closestHit.didHit)
 		{
-			Vector3 directionToLight = LightUtils::GetDirectionToLight(lights[lightIdx], closestHit.origin + closestHit.normal * 0.01f);
+			Vector3 directionToLight = LightUtils::GetDirectionToLight(light, closestHit.origin + closestHit.normal * 0.01f);
 			const float LambertCosine{ LightUtils::GetLambertCosine(closestHit.normal, directionToLight.Normalized()) };
 			//Apply shadows
 			if (m_AreShadowsEnabled)
@@ -162,7 +162,7 @@ void dae::Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, f
 			case LightingMode::Radiance:
 			{
 				if (LambertCosine != 0.f)
-					finalColor += LightUtils::GetRadiance(lights[lightIdx], closestHit.origin);
+					finalColor += LightUtils::GetRadiance(light, closestHit.origin);
 				break;
 			}
 			case LightingMode::BRDF:
@@ -174,7 +174,7 @@ void dae::Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, f
 			case LightingMode::Combined:
 			{
 				if (LambertCosine != 0.f)
-					finalColor += LightUtils::GetRadiance(lights[lightIdx], closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit, directionToLight.Normalized(), -viewRay.direction) * LambertCosine;
+					finalColor += LightUtils::GetRadiance(light, closestHit.origin) * materials[closestHit.materialIndex]->Shade(closestHit, directionToLight.Normalized(), -viewRay.direction) * LambertCosine;
 				break;
 			}
 			}

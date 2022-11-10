@@ -30,25 +30,10 @@ namespace dae {
 
 	void dae::Scene::GetClosestHit(const Ray& ray, HitRecord& closestHit) const
 	{
-		//todo W1 DONE
 		HitRecord temp{};
-		for (size_t i = 0; i < m_SphereGeometries.size(); i++)
+		for (const auto& sphere : m_SphereGeometries)
 		{
-			if (GeometryUtils::HitTest_Sphere(m_SphereGeometries[i], ray, temp))
-			{
-				if (temp.t <= closestHit.t)
-				{
-					closestHit.didHit = temp.didHit;
-					closestHit.materialIndex = temp.materialIndex;
-					closestHit.normal = temp.normal;
-					closestHit.origin = temp.origin;
-					closestHit.t = temp.t;
-				}
-			}
-		}
-		for (size_t i = 0; i < m_PlaneGeometries.size(); i++)
-		{
-			if (GeometryUtils::HitTest_Plane(m_PlaneGeometries[i], ray, temp))
+			if (GeometryUtils::HitTest_Sphere_Geometric(sphere, ray, temp))
 			{
 				if (temp.t <= closestHit.t)
 				{
@@ -61,9 +46,9 @@ namespace dae {
 			}
 		}
 
-		for (size_t i = 0; i < m_Triangles.size(); i++)
+		for (const auto& plane : m_PlaneGeometries)
 		{
-			if (GeometryUtils::HitTest_Triangle(m_Triangles[i], ray, temp, false))
+			if (GeometryUtils::HitTest_Plane(plane, ray, temp))
 			{
 				if (temp.t <= closestHit.t)
 				{
@@ -76,9 +61,9 @@ namespace dae {
 			}
 		}
 
-		for (size_t i = 0; i < m_TriangleMeshGeometries.size(); i++)
+		for (const auto& mesh : m_TriangleMeshGeometries)
 		{
-			if (GeometryUtils::HitTest_TriangleMesh(m_TriangleMeshGeometries[i], ray, temp, false))
+			if (GeometryUtils::HitTest_TriangleMesh(mesh, ray, temp, false))
 			{
 				if (temp.t <= closestHit.t)
 				{
@@ -95,35 +80,22 @@ namespace dae {
 
 	bool Scene::DoesHit(const Ray& ray) const
 	{
-		//todo W3 DONE
-		for (size_t planeIdx = 0; planeIdx < m_PlaneGeometries.size(); planeIdx++)
+		for (const auto& sphere : m_SphereGeometries)
 		{
-			if (GeometryUtils::HitTest_Plane(m_PlaneGeometries[planeIdx],ray))
+			if (GeometryUtils::HitTest_Sphere_Geometric(sphere, ray))
 			{
 				return true;
 			}
 		}
-		for (size_t sphereIdx = 0; sphereIdx < m_SphereGeometries.size(); sphereIdx++)
+
+		for (const auto& mesh : m_TriangleMeshGeometries)
 		{
-			if (GeometryUtils::HitTest_Sphere(m_SphereGeometries[sphereIdx], ray))
+			if (GeometryUtils::HitTest_TriangleMesh(mesh, ray))
 			{
 				return true;
 			}
 		}
-		for (size_t triangleIdx = 0; triangleIdx < m_Triangles.size(); triangleIdx++)
-		{
-			if (GeometryUtils::HitTest_Triangle(m_Triangles[triangleIdx], ray))
-			{
-				return true;
-			}
-		}
-		for (size_t meshIdx = 0; meshIdx < m_TriangleMeshGeometries.size(); meshIdx++)
-		{
-			if (GeometryUtils::HitTest_TriangleMesh(m_TriangleMeshGeometries[meshIdx], ray))
-			{
-				return true;
-			}
-		}
+
 		return false;
 	}
 
