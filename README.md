@@ -11,4 +11,4 @@ A custom ray tracer developed in C++ from the ground up for the Graphics Product
 ## Spheres & Planes
 First we write out the code for a basic raytracer using a fixed camera and simple material on primitives like spheres and planes.
 
-![Raytracing flow] ()
+![Raytracing flow] (https://github.com/TehPrometheus/GrP-Ray-Tracer/blob/main/lib/raytracing_flow_1.png)
