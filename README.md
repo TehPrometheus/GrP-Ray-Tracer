@@ -26,11 +26,11 @@ Third, we implement more complex lighting by approximating the rendering equatio
 
 Light scattering can be simulated using the Bidirectional Reflectance Distribution Function (BRDF), which is a part of the rendering equation. After implementing a Lambert Diffuse BRDF and accounting for specular reflection, we get the following:
 
-![](https://github.com/TehPrometheus/GrP-Ray-Tracer/blob/main/lib/spheres_and_planes_fig1.png)
+![](https://github.com/TehPrometheus/GrP-Ray-Tracer/blob/main/lib/Lighting_fig2.png)
 
 No surface is perfectly smooth, you'll always find tiny dents and bumps on a molecular level. These imperfections shape how we view objects when light interacts with them. We need to take these into account if we're serious about having physically accurate scattering. Implementing these imperfections by tweaking the BRDF renders the final scene:
 
-![](https://github.com/TehPrometheus/GrP-Ray-Tracer/blob/main/lib/Lighting_fig2.png)
+![](https://github.com/TehPrometheus/GrP-Ray-Tracer/blob/main/lib/Lighting_fig3.png)
 
 ## §4. Triangle Meshes
 
