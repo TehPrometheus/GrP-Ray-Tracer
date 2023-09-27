@@ -1,4 +1,4 @@
-![image](https://github.com/TehPrometheus/GrP-Ray-Tracer/assets/95450900/e2743bf5-abf8-48c8-87f8-82bdc6e5b90b)# Graphics Production Course Project: Ray Tracer
+# Graphics Production Course Project: Ray Tracer
 A custom ray tracer developed in C++ from the ground up for the Graphics Production Course at the DAE school.
 
 ## §1. Spheres & Planes
