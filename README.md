@@ -15,4 +15,4 @@ First we write out the code for a basic raytracer using a fixed camera and simpl
 
 A simple scene of spheres and planes using basic materials gives us the following result:
 
-![](https://github.com/TehPrometheus/GrP-Ray-Tracer/blob/main/lib/raytracing_flow_1.png)
+![](https://github.com/TehPrometheus/GrP-Ray-Tracer/blob/main/lib/spheres_and_planes_fig2.png)
