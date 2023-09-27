@@ -13,7 +13,7 @@ A simple scene of spheres and planes using basic materials gives us the followin
 ## §2. Camera & Shadows
 Second, we add camera functionality and a basic directional light. If a pixel hits a material, we check if it's shadowed for each light:
 
-![](https://github.com/TehPrometheus/GrP-Ray-Tracer/blob/main/lib/camera_and_shadows_fig1.png)
+![](https://github.com/TehPrometheus/GrP-Ray-Tracer/blob/main/lib/camera_and_shadowsfig1.png)
 
 Now our scene looks like this:
 
