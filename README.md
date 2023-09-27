@@ -8,10 +8,10 @@ outline:
 # Graphics Production Course Project: Ray Tracer
 A custom ray tracer developed in C++ from the ground up for the Graphics Production Course at the DAE school.
 
-## Spheres & Planes
+## §1. Spheres & Planes
 First we write out the code for a basic raytracer using a fixed camera and simple material on primitives like spheres and planes:
 
-![](https://github.com/TehPrometheus/GrP-Ray-Tracer/blob/main/lib/raytracing_flow_1.png)
+![](https://github.com/TehPrometheus/GrP-Ray-Tracer/blob/main/lib/spheres_and_planes_fig1.png)
 
 A simple scene of spheres and planes using basic materials gives us the following result:
 
